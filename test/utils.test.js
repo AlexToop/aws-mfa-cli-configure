@@ -76,7 +76,6 @@ aws_access_key_id = test
 aws_secret_access_key = test
 aws_session_token = test`
 
-    const actual = editAwsCredentials(testDir, exampleMfaProfile)
     const expected = `aws_access_key_id = test
 aws_secret_access_key = test
 
@@ -90,6 +89,12 @@ aws_access_key_id = test
 aws_secret_access_key = test
 aws_session_token = test`
 
-    expect(actual).toEqual(expected)
+    editAwsCredentials(testDir, exampleMfaProfile)
+
+    const checkFile = function () {
+      expect(actual).toEqual(expected)
+    }
+
+    setTimeout(function(){ checkFile }, 100);
   })
 })
