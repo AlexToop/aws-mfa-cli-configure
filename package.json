@@ -1,0 +1,32 @@
+{
+  "name": "aws-mfa-cli-configure",
+  "version": "1.0.0",
+  "description": "A command line tool to assist people obtaining and storing multi-factor authentication AWS CLI credentials.",
+  "main": "bin/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "standard --fix",
+    "globalInstall": "npm install -g .",
+    "globalUninstall": "npm uninstall -g aws-mfa-cli-configure"
+  },
+  "bin": {
+    "awsMfa": "./bin/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlexToop/aws-mfa-cli-configure.git"
+  },
+  "author": "Alexander Toop",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/AlexToop/aws-mfa-cli-configure/issues"
+  },
+  "homepage": "https://github.com/AlexToop/aws-mfa-cli-configure#readme",
+  "dependencies": {
+    "child_process": "^1.0.2",
+    "yargs": "^13.2.4"
+  },
+  "devDependencies": {
+    "standard": "^14.3.1"
+  }
+}
