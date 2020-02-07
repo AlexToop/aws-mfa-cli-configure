@@ -3,6 +3,9 @@
 const yargs = require('yargs')
 const { exec } = require('child_process')
 
+const { getCredentials, getStsCommand, getObjFromStdout, editAwsCredentials } = require('./utils')
+
+const awsCredentialsDir = process.env.HOME + '/.aws/credentials'
 const timeout = 900
 
 const options = yargs
@@ -12,50 +15,25 @@ const options = yargs
   .option('p', { alias: 'profile', describe: 'aws config profile to create mfa auth for', type: 'string', demandOption: false })
   .argv
 
-const getStsCommand = function (mfaCode, device, timeout, profile) {
-  let baseCommand = `aws sts get-session-token --serial-number ${device} --token-code ${mfaCode} --duration-seconds ${timeout}`
-  if (profile) {
-    baseCommand += ` --profile ${profile}`
-  }
-  return baseCommand
-}
-
-const processAwsCredentials = function (stsCommand, callback) {
+const callAwsCredentialsStdout = function (stsCommand, callback) {
   exec(stsCommand, (error, stdout, stderr) => {
     if (error || stderr) {
       console.log(error ? `error: ${error.message}` : `stderr: ${stderr}`)
-      return 
-    } 
-
-    try {
-      const credentialsObject = JSON.parse(stdout)
-      callback(credentialsObject)
-    } catch (e) {
-      console.log(`error parsing aws response: ${e}`)
-      return 
+      return
     }
+    callback(stdout)
   })
 }
 
-const writeCredentials = function (keyId, secretAccess, token) {
-  const profile = `
-  [toop-mfa]
-  aws_access_key_id = ${keyId}
-  aws_secret_access_key = ${secretAccess}
-  aws_session_token = ${token}`
+const processReturnedStdout = function (awsStdout) {
+  console.log(awsStdout)
+  const credentials = getObjFromStdout(awsStdout)
+  console.log(credentials)
+  const profile = getCredentials(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken)
   console.log(profile)
+  const output = editAwsCredentials(awsCredentialsDir, profile)
+  console.log(output)
 }
 
-const run = async function (mfa, device, timeout, profile) {
-  const onCredentialsReturned = function (credentials) {
-    const AccessKeyId = credentials.Credentials.AccessKeyId
-    const SecretAccessKey = credentials.Credentials.SecretAccessKey
-    const SessionToken = credentials.Credentials.SessionToken
-    writeCredentials(AccessKeyId, SecretAccessKey, SessionToken)
-  }
-
-  const stsCommand = getStsCommand(mfa, device, timeout, profile)
-  processAwsCredentials(stsCommand, onCredentialsReturned)
-}
-
-run(options.mfa, options.device, timeout, options.profile)
+const stsCommand = getStsCommand(options.mfa, options.device, timeout, options.profile)
+callAwsCredentialsStdout(stsCommand, processReturnedStdout)
