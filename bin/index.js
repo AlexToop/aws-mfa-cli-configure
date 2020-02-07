@@ -37,14 +37,25 @@ const processAwsCredentials = function (stsCommand, callback) {
   })
 }
 
+const writeCredentials = function (keyId, secretAccess, token) {
+  const profile = `
+  [toop-mfa]
+  aws_access_key_id = ${keyId}
+  aws_secret_access_key = ${secretAccess}
+  aws_session_token = ${token}`
+  console.log(profile)
+}
+
 const run = async function (mfa, device, timeout, profile) {
   const onCredentialsReturned = function (credentials) {
-    console.log(`success!! ${credentials.SessionToken}`)
+    const AccessKeyId = credentials.Credentials.AccessKeyId
+    const SecretAccessKey = credentials.Credentials.SecretAccessKey
+    const SessionToken = credentials.Credentials.SessionToken
+    writeCredentials(AccessKeyId, SecretAccessKey, SessionToken)
   }
 
   const stsCommand = getStsCommand(mfa, device, timeout, profile)
   processAwsCredentials(stsCommand, onCredentialsReturned)
-  
 }
 
 run(options.mfa, options.device, timeout, options.profile)
