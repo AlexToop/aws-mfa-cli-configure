@@ -67,7 +67,7 @@ describe('getObjFromStdout()', () => {
   })
 })
 
-describe.only('editAwsCredentials()', () => {
+describe('editAwsCredentials()', () => {
   test('can write new data correctly', () => {
     const testDir = __dirname + '/helpers/fakeCredentials'
     const exampleMfaProfile = `
