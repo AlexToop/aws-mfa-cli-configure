@@ -81,6 +81,10 @@ aws_secret_access_key = test
 [test]
 aws_access_key_id = test
 aws_secret_access_key = test
+aws_session_token = test
+[toopMFA]
+aws_access_key_id = test
+aws_secret_access_key = test
 aws_session_token = test`
 
   afterEach(async () => {
