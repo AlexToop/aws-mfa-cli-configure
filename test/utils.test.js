@@ -4,7 +4,7 @@ const fs = require('fs').promises
 
 describe('getCredentials()', () => {
   test('credentials are returned in the correct format', () => {
-    const actual = getCredentials('exampleKeyId', 'exampleSecretAccess', 'exampleToken')
+    const actual = getCredentials('exampleKeyId', 'exampleSecretAccess', 'exampleToken', 'testProfile')
     const expected = `
 [testProfileMFA]
 aws_access_key_id = exampleKeyId
