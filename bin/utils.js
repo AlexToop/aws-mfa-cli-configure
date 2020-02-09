@@ -1,11 +1,11 @@
-const fs = require('fs')
+const fs = require('fs').promises
 
 const getCredentials = function (keyId, secretAccess, token) {
   return `
-  [toopMFA]
-  aws_access_key_id = ${keyId}
-  aws_secret_access_key = ${secretAccess}
-  aws_session_token = ${token}`
+[toopMFA]
+aws_access_key_id = ${keyId}
+aws_secret_access_key = ${secretAccess}
+aws_session_token = ${token}`
 }
 
 const getStsCommand = function (mfaCode, device, timeout, profile) {
@@ -21,16 +21,9 @@ const getObjFromStdout = function (stdout) {
   return credentialsObject
 }
 
-const editAwsCredentials = function (awsCredentialsDir, credentials) {
-  console.log(awsCredentialsDir)
-  fs.readFile(awsCredentialsDir, 'utf-8', (err, data) => {
-    if (err) { console.log(err) }
-    console.log(data)
-  })
-  fs.appendFile(awsCredentialsDir, credentials, function (err) {
-    if (err) throw err
-    console.log('written...')
-  })
+const editAwsCredentials = async function (awsCredentialsDir, credentials, callback) {
+  await fs.appendFile(awsCredentialsDir, credentials)
+  return fs.readFile(awsCredentialsDir, 'utf8')
 }
 
 module.exports = {

@@ -1,14 +1,15 @@
 /* eslint-env jest */
 const { getCredentials, getStsCommand, getObjFromStdout, editAwsCredentials } = require('../bin/utils')
+const fs = require('fs').promises
 
 describe('getCredentials()', () => {
   test('credentials are returned in the correct format', () => {
     const actual = getCredentials('exampleKeyId', 'exampleSecretAccess', 'exampleToken')
     const expected = `
-  [toop-mfa]
-  aws_access_key_id = exampleKeyId
-  aws_secret_access_key = exampleSecretAccess
-  aws_session_token = exampleToken`
+[toopMFA]
+aws_access_key_id = exampleKeyId
+aws_secret_access_key = exampleSecretAccess
+aws_session_token = exampleToken`
 
     expect(actual).toEqual(expected)
   })
@@ -68,33 +69,30 @@ describe('getObjFromStdout()', () => {
 })
 
 describe('editAwsCredentials()', () => {
-  test('can write new data correctly', () => {
-    const testDir = __dirname + '/helpers/fakeCredentials'
-    const exampleMfaProfile = `
+  const testDir = __dirname + '/helpers/fakeCredentials'
+  const exampleMfaProfile = `
 [toopMFA]
 aws_access_key_id = test
 aws_secret_access_key = test
 aws_session_token = test`
-
-    const expected = `aws_access_key_id = test
+  const testFileContent = `aws_access_key_id = test
 aws_secret_access_key = test
 
 [test]
 aws_access_key_id = test
 aws_secret_access_key = test
-aws_session_token = test
-
-[toopMFA]
-aws_access_key_id = test
-aws_secret_access_key = test
 aws_session_token = test`
 
-    editAwsCredentials(testDir, exampleMfaProfile)
+  afterEach(async () => {
+    await fs.writeFile(testDir, testFileContent)
+  })
 
-    const checkFile = function () {
-      expect(actual).toEqual(expected)
-    }
-
-    setTimeout(function(){ checkFile }, 100);
+  test('data is appended to the file correctly', async () => {
+    let expected = await fs.readFile(testDir, 'utf8')
+    expected += exampleMfaProfile
+    
+    await editAwsCredentials(testDir, exampleMfaProfile)
+    let actual = await fs.readFile(testDir, 'utf8')  
+    expect(actual).toEqual(expected)
   })
 })
