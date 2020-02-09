@@ -106,6 +106,7 @@ aws_session_token = test`
     let expected = await fs.readFile(testDir, 'utf8')    
     await editAwsCredentials(testDir, exampleMfaProfile)
     let actual = await fs.readFile(testDir, 'utf8')  
+    console.log('actual', actual, 'expected', expected) 
     expect(actual).toEqual(expected)
   })
 
@@ -118,7 +119,7 @@ aws_session_token = test`
     let expected = await fs.readFile(testDir, 'utf8') 
     expected += profile2
     await editAwsCredentials(testDir, profile2)
-    let actual = await fs.readFile(testDir, 'utf8')  
+    let actual = await fs.readFile(testDir, 'utf8') 
     expect(actual).toEqual(expected)
   })
 })

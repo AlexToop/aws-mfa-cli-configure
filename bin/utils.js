@@ -25,12 +25,13 @@ const editAwsCredentials = async function (awsCredentialsDir, credentials, callb
   let currentFileContents = await fs.readFile(awsCredentialsDir, 'utf8')
   const linesOfFile = currentFileContents.split(/\r?\n/)
   const linesOfCredentials = credentials.split(/\r?\n/)
-  const profile = linesOfCredentials[0]
+  const profile = linesOfCredentials[1]
 
   let i
   let found = false
   for (i = 0; i < linesOfFile.length; i++) {
     if (linesOfFile[i] === profile) {
+      console.log('found match profile:', profile, 'lines file', linesOfFile[i])
       found = true
       linesOfFile[i + 1] = linesOfCredentials[1]
       linesOfFile[i + 2] = linesOfCredentials[2]
