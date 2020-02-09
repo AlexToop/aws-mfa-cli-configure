@@ -27,7 +27,7 @@ const callAwsCredentialsStdout = function (stsCommand, callback) {
 
 const processReturnedStdout = async function (awsStdout) {
   const credentials = getObjFromStdout(awsStdout)
-  const profile = getCredentials(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken)
+  const profile = getCredentials(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken, profile)
   const output = await editAwsCredentials(awsCredentialsDir, profile, onWritten)
 }
 

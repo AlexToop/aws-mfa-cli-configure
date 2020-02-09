@@ -6,7 +6,18 @@ describe('getCredentials()', () => {
   test('credentials are returned in the correct format', () => {
     const actual = getCredentials('exampleKeyId', 'exampleSecretAccess', 'exampleToken')
     const expected = `
-[toopMFA]
+[testProfileMFA]
+aws_access_key_id = exampleKeyId
+aws_secret_access_key = exampleSecretAccess
+aws_session_token = exampleToken`
+
+    expect(actual).toEqual(expected)
+  })
+
+  test('credentials are returned in the correct format for default profile', () => {
+    const actual = getCredentials('exampleKeyId', 'exampleSecretAccess', 'exampleToken')
+    const expected = `
+[defaultMFA]
 aws_access_key_id = exampleKeyId
 aws_secret_access_key = exampleSecretAccess
 aws_session_token = exampleToken`
@@ -71,18 +82,18 @@ describe('getObjFromStdout()', () => {
 describe('editAwsCredentials()', () => {
   const testDir = __dirname + '/helpers/fakeCredentials'
   const exampleMfaProfile = `
-[toopMFA]
+[testProfileMFA]
 aws_access_key_id = test
 aws_secret_access_key = test
 aws_session_token = test`
   const testFileContent = `aws_access_key_id = test
 aws_secret_access_key = test
 
-[test]
+[testProfile]
 aws_access_key_id = test
 aws_secret_access_key = test
 aws_session_token = test
-[toopMFA]
+[testProfileMFA]
 aws_access_key_id = test
 aws_secret_access_key = test
 aws_session_token = test`
@@ -91,11 +102,22 @@ aws_session_token = test`
     await fs.writeFile(testDir, testFileContent)
   })
 
-  test('data is appended to the file correctly', async () => {
-    let expected = await fs.readFile(testDir, 'utf8')
-    expected += exampleMfaProfile
-    
+  test('old profile mfa code should be overwritten', async () => {
+    let expected = await fs.readFile(testDir, 'utf8')    
     await editAwsCredentials(testDir, exampleMfaProfile)
+    let actual = await fs.readFile(testDir, 'utf8')  
+    expect(actual).toEqual(expected)
+  })
+
+  test('different profile mfa should not be overwritten', async () => {
+    const profile2 = `
+[testProfile2MFA]
+aws_access_key_id = test
+aws_secret_access_key = test
+aws_session_token = test`
+    let expected = await fs.readFile(testDir, 'utf8') 
+    expected += profile2
+    await editAwsCredentials(testDir, profile2)
     let actual = await fs.readFile(testDir, 'utf8')  
     expect(actual).toEqual(expected)
   })

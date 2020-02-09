@@ -1,8 +1,8 @@
 const fs = require('fs').promises
 
-const getCredentials = function (keyId, secretAccess, token) {
+const getCredentials = function (keyId, secretAccess, token, profile) {
   return `
-[toopMFA]
+[${profile ? profile : 'default'}MFA]
 aws_access_key_id = ${keyId}
 aws_secret_access_key = ${secretAccess}
 aws_session_token = ${token}`
@@ -19,6 +19,10 @@ const getStsCommand = function (mfaCode, device, timeout, profile) {
 const getObjFromStdout = function (stdout) {
   const credentialsObject = JSON.parse(stdout).Credentials
   return credentialsObject
+}
+
+const checkIfCredentialsAlreadyExist = async function (profile) {
+
 }
 
 const editAwsCredentials = async function (awsCredentialsDir, credentials, callback) {
