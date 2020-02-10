@@ -11,7 +11,7 @@ npm install -g .
     Permissions are required often to install to the global node directory.
     sudo chown -R $USER /usr/local/lib/node_modules
 
-awsMfa
+mfa -d arn -m 084562
     This will run the generator
 
 ## Local to remove

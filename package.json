@@ -5,13 +5,13 @@
   "main": "bin/index.js",
   "scripts": {
     "test": "jest",
-    "start": "npm run globalInstall && awsMfa -d example -p innov -m 984946 && npm run globalUninstall",
+    "start": "npm run globalInstall && mfa -d arn -m 084562 && npm run globalUninstall",
     "lint": "standard --fix",
     "globalInstall": "npm install -g .",
     "globalUninstall": "npm uninstall -g aws-mfa-cli-configure"
   },
   "bin": {
-    "awsMfa": "./bin/index.js"
+    "mfa": "./bin/index.js"
   },
   "repository": {
     "type": "git",
