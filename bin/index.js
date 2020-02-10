@@ -31,7 +31,7 @@ const processReturnedStdout = async function (awsStdout) {
   const credentials = getObjFromStdout(awsStdout)
   const profile = getCredentials(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken, options.profile)
   const output = await editAwsCredentials(awsCredentialsDir, profile)
-  console.log(`Success: Use the following profile: ${output}`)
+  console.log(`Success! Use the following profile: ${output}`)
 }
 
 const stsCommand = getStsCommand(options.mfa, options.device, timeout, options.profile)
