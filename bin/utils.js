@@ -21,7 +21,7 @@ const getObjFromStdout = function (stdout) {
   return credentialsObject
 }
 
-const editAwsCredentials = async function (awsCredentialsDir, credentials, callback) {
+const editAwsCredentials = async function (awsCredentialsDir, credentials) {
   let currentFileContents = await fs.readFile(awsCredentialsDir, 'utf8')
   const linesOfFile = currentFileContents.split(/\r?\n/)
   const linesOfCredentials = credentials.split(/\r?\n/)
@@ -30,7 +30,6 @@ const editAwsCredentials = async function (awsCredentialsDir, credentials, callb
   let found = false
   for (let i = 0; i < linesOfFile.length; i++) {
     if (linesOfFile[i] === profile) {
-      console.log('found match profile:', profile, 'lines file', linesOfFile[i])
       found = true
       linesOfFile[i + 1] = linesOfCredentials[2]
       linesOfFile[i + 2] = linesOfCredentials[3]
@@ -41,11 +40,9 @@ const editAwsCredentials = async function (awsCredentialsDir, credentials, callb
     }
   }
   currentFileContents = linesOfFile.join('\n')
-
-
-  let toWrite = (found) ? currentFileContents : currentFileContents + credentials
+  const toWrite = (found) ? currentFileContents : currentFileContents + credentials
   await fs.writeFile(awsCredentialsDir, toWrite)
-  return 
+  return profile
 }
 
 module.exports = {
