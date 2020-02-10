@@ -32,9 +32,12 @@ const editAwsCredentials = async function (awsCredentialsDir, credentials, callb
     if (linesOfFile[i] === profile) {
       console.log('found match profile:', profile, 'lines file', linesOfFile[i])
       found = true
-      linesOfFile[i + 1] = linesOfCredentials[1]
-      linesOfFile[i + 2] = linesOfCredentials[2]
-      linesOfFile[i + 3] = linesOfCredentials[3]
+      linesOfFile[i + 1] = linesOfCredentials[2]
+      linesOfFile[i + 2] = linesOfCredentials[3]
+      linesOfFile[i + 3] = linesOfCredentials[4]
+    }
+    if (found) {
+      break;
     }
   }
   currentFileContents = linesOfFile.join('\n')
