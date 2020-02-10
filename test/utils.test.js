@@ -93,11 +93,9 @@ aws_secret_access_key = test` + exampleProfile
   })
 
   test('different profile mfa creation should not overwrite any other profiles', async () => {
-    const profile2 = `
-[testProfile2MFA]
-aws_access_key_id = exampleKeyId
-aws_secret_access_key = exampleSecretAccess
-aws_session_token = exampleToken`
+    let profile = exampleProfile.split(/\r?\n/)
+    profile[1] = '[testProfile2MFA]'
+    let profile2 = profile.join('\n')
     let expected = await fs.readFile(testDir, 'utf8') 
     expected += profile2
     await editAwsCredentials(testDir, profile2)
