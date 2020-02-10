@@ -2,14 +2,16 @@
 const { getCredentials, getStsCommand, getObjFromStdout, editAwsCredentials } = require('../bin/utils')
 const fs = require('fs').promises
 
-describe('getCredentials()', () => {
-  test('credentials are returned in the correct format', () => {
-    const actual = getCredentials('exampleKeyId', 'exampleSecretAccess', 'exampleToken', 'testProfile')
-    const expected = `
+const exampleProfile = `
 [testProfileMFA]
 aws_access_key_id = exampleKeyId
 aws_secret_access_key = exampleSecretAccess
 aws_session_token = exampleToken`
+
+describe('getCredentials()', () => {
+  test('credentials are returned in the correct format', () => {
+    const actual = getCredentials('exampleKeyId', 'exampleSecretAccess', 'exampleToken', 'testProfile')
+    const expected = exampleProfile
 
     expect(actual).toEqual(expected)
   })
@@ -43,15 +45,17 @@ describe('getStsCommand()', () => {
 })
 
 describe('getObjFromStdout()', () => {
+  const stdout = `{
+    "Credentials": {
+        "SecretAccessKey": "sadfasdf+exampleklasjdfkasd:", 
+        "SessionToken": "sadfasdf+exampleklasjdfkasd:", 
+        "Expiration": "1970-01-01T09:00:00Z", 
+        "AccessKeyId": "sadfasdf+exampleklasjdfkasd:"
+    }
+  }`
+
   test('non json stdout throws an error', () => {
-    const badStdout = `{
-      "Credent
-          "SecretAccessKey": "sadfasdf+exampleklasjdfkasd:", 
-          "SessionToken": "sadfasdf+exampleklasjdfkasd:", 
-          "Expiration": "1970-01-01T09:00:00Z", 
-          "AccessKeyId": "sadfasdf+exampleklasjdfkasd:"
-      }
-    }`
+    const badStdout = stdout + '}'
 
     expect(() => {
       getObjFromStdout(badStdout)
@@ -59,14 +63,7 @@ describe('getObjFromStdout()', () => {
   })
 
   test('good json stdout returns a valid object', () => {
-    const goodStdout = `{
-      "Credentials": {
-          "SecretAccessKey": "sadfasdf+exampleklasjdfkasd:", 
-          "SessionToken": "sadfasdf+exampleklasjdfkasd:", 
-          "Expiration": "1970-01-01T09:00:00Z", 
-          "AccessKeyId": "sadfasdf+exampleklasjdfkasd:"
-      }
-    }`
+    const goodStdout = stdout
 
     const actual = getObjFromStdout(goodStdout)
     const expected = {
@@ -81,41 +78,26 @@ describe('getObjFromStdout()', () => {
 
 describe('editAwsCredentials()', () => {
   const testDir = __dirname + '/helpers/fakeCredentials'
-  const exampleMfaProfile = `
-[testProfileMFA]
-aws_access_key_id = test
-aws_secret_access_key = test
-aws_session_token = test`
   const testFileContent = `aws_access_key_id = test
-aws_secret_access_key = test
-
-[testProfile]
-aws_access_key_id = test
-aws_secret_access_key = test
-aws_session_token = test
-[testProfileMFA]
-aws_access_key_id = test
-aws_secret_access_key = test
-aws_session_token = test`
+aws_secret_access_key = test` + exampleProfile
 
   afterEach(async () => {
     await fs.writeFile(testDir, testFileContent)
   })
 
-  test('old profile mfa code should be overwritten', async () => {
+  test('generation of new mfa for a pre-existing mfa generated profile should overwrite', async () => {
     let expected = await fs.readFile(testDir, 'utf8')    
-    await editAwsCredentials(testDir, exampleMfaProfile)
+    await editAwsCredentials(testDir, exampleProfile)
     let actual = await fs.readFile(testDir, 'utf8')  
-    console.log('actual', actual, 'expected', expected) 
     expect(actual).toEqual(expected)
   })
 
-  test('different profile mfa should not be overwritten', async () => {
+  test('different profile mfa creation should not overwrite any other profiles', async () => {
     const profile2 = `
 [testProfile2MFA]
-aws_access_key_id = test
-aws_secret_access_key = test
-aws_session_token = test`
+aws_access_key_id = exampleKeyId
+aws_secret_access_key = exampleSecretAccess
+aws_session_token = exampleToken`
     let expected = await fs.readFile(testDir, 'utf8') 
     expected += profile2
     await editAwsCredentials(testDir, profile2)
