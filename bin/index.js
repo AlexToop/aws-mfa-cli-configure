@@ -2,10 +2,11 @@
 
 const yargs = require('yargs')
 const { exec } = require('child_process')
+const os = require('os')
 
 const { getCredentials, getStsCommand, getObjFromStdout, editAwsCredentials } = require('./utils')
 
-const awsCredentialsDir = process.env.HOME + '/.aws/credentials'
+const awsCredentialsDir = os.homedir() + '/.aws/credentials'
 
 const options = yargs
   .usage('Usage: -m <mfa> -d <device>')
