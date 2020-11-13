@@ -11,7 +11,7 @@ A command line tool to assist people obtaining and storing multi-factor authenti
 For a global installation:
 
 ```
-npm install -g git://github.com/AlexToop/aws-mfa-cli-configure.git#v1.0.1
+npm install -g AlexToop/aws-mfa-cli-configure.git#v1.0.1
 ```
 
 MacOS may require the following permissions for global NPM installations:
